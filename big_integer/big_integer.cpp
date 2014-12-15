@@ -1,6 +1,6 @@
 #include "big_integer.hpp"
 #include <iostream>
-#include <algorithm
+#include <algorithm>
 
 
 big_integer::big_integer() {
@@ -13,8 +13,8 @@ big_integer::big_integer(big_integer && other) {
 };
 
 big_integer::big_integer(big_integer const& copy) {
-    sign = copy.sign;
-    digits = copy.digits;
+    this->sign = copy.sign;
+    this->digits = copy.digits;
 };
 
 big_integer::big_integer(int number) {
@@ -67,6 +67,12 @@ big_integer& big_integer::operator=(big_integer const& other) {
 };
 
 big_integer& big_integer::operator+=(big_integer const& rhs) {
+    if (sign == 0) {
+        *this = rhs;
+        return *this;
+    }
+    if (rhs.sign == 0)
+        return *this;
     if (sign == rhs.sign) {
         int carry = 0;
         for (int i = 0; i < std::max(digits.size(), rhs.digits.size()) || carry; ++i) {
@@ -79,6 +85,7 @@ big_integer& big_integer::operator+=(big_integer const& rhs) {
         return *this;
     }
     else {
+        big_integer temp;
         switch (absoluteComparator(*this, rhs)) {
             case 0:
                 *this = big_integer();
@@ -95,9 +102,11 @@ big_integer& big_integer::operator+=(big_integer const& rhs) {
                 return *this;
             case -1:
                 sign = -sign;
-                *this = rhs - *this;
+                temp = rhs - *this;
+                *this = temp;
                 return *this;
-            default:;
+            default:
+            	break;
         }
         return *this;
     }
@@ -106,6 +115,21 @@ big_integer& big_integer::operator+=(big_integer const& rhs) {
 
 big_integer& big_integer::operator-=(big_integer const& rhs) {
     if (sign == rhs.sign) {
+        big_integer temp;
+        switch (absoluteComparator(*this, rhs)) {
+            case 0:
+                *this = big_integer();
+                return *this;
+            case 1:
+            	break;
+            case -1:
+                temp = rhs - *this;
+                temp.sign = -temp.sign;
+                *this = temp;
+                return *this;
+            default:
+            	break;
+        }
         int carry = 0;
         for (int i = 0; i < rhs.digits.size() || carry; ++i) {
             digits[i] -= carry + (i < rhs.digits.size() ? rhs.digits[i] : 0);
@@ -114,6 +138,7 @@ big_integer& big_integer::operator-=(big_integer const& rhs) {
         }
         while (digits.size() > 1 && digits.back() == 0)
             digits.pop_back();
+        return *this;
     }
     else {
             *this += -rhs;
@@ -132,7 +157,9 @@ big_integer& big_integer::operator*=(char rhs) {
     }
     while (digits.size() > 1 && digits.back() == 0)
         digits.pop_back();
+    return *this;
 };
+
 big_integer& big_integer::operator*=(big_integer const& rhs) {
     sign *= rhs.sign;
     if (!sign)
@@ -141,12 +168,11 @@ big_integer& big_integer::operator*=(big_integer const& rhs) {
     for (int i = 0; i < rhs.digits.size(); i++) {
         temp1 *= rhs.digits[i];
         for (int j = 0; j < i; j++)
-            temp1.digits.insert(digits.begin(), 0);
+            temp1.digits.insert(temp1.digits.begin(), 0);
         temp2 += temp1;
         temp1 = *this;
     }
     return *this = temp2;
-
 };
 
 big_integer big_integer::operator+() const

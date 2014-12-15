@@ -50,7 +50,8 @@ bool testOneSub() {
     big_integer bi2 = big_integer(rhs);
     bi1 -= bi2;
     big_integer ans = big_integer(ansInt);
-    //cerr << lhs << " -= " << rhs << " -> " << to_string(bi1) << " ? " << to_string(ans) << endl;
+    if (to_string(bi1) != to_string(ans))
+        cerr << lhs << " -= " << rhs << " -> " << to_string(bi1) << " ? " << to_string(ans) << endl;
     return to_string(bi1) == to_string(ans);
 }
 
@@ -72,7 +73,7 @@ bool testOneMul() {
     big_integer bi2 = big_integer(rhs);
     bi1 *= bi2;
     big_integer ans = big_integer(ansInt);
-    cerr << lhs << " * " << rhs << " = " << bi1 << " (" << ansInt << ")" << endl;
+    //cerr << lhs << " * " << rhs << " = " << bi1 << " (" << ansInt << ")" << endl;
     return to_string(bi1) == to_string(ans);
 }
 
@@ -105,12 +106,13 @@ void testMul(int number) {
 
 int main() {
     srand (time(NULL));
-    big_integer x = big_integer(838850);
-
-    big_integer y = big_integer(852106);
-    x += y;
+    big_integer x = big_integer(145);
+    big_integer y = big_integer(514);
+    x *= y;
     cout << x << endl;
     testAdd(1000);
     testSub(1000);
     testMul(1000);
+
+    return 0;
 }
