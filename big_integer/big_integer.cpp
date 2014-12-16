@@ -1,7 +1,7 @@
 #include "big_integer.hpp"
 #include <iostream>
 #include <algorithm>
-
+#include "exception.cpp"
 
 big_integer::big_integer() {
     sign = 0;
@@ -37,7 +37,10 @@ big_integer::big_integer(int number) {
 };
 
 big_integer::big_integer(std::string const& str) {
-    if (str == "" || str == "0") {
+    if (str == "") {
+        throw parse_exception("Empty string");
+    }
+    if (str == "0") {
         *this = big_integer();
     }
     else {
@@ -50,7 +53,7 @@ big_integer::big_integer(std::string const& str) {
         }
         for (int i = 1; i < str.size(); ++i) {
             if (!isdigit(str[i])) {
-                //TODO:exceptions
+                throw parse_exception("Illegal character");
             }
             this->digits.push_back(str[i] - 48);
         }
