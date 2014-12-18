@@ -1,10 +1,4 @@
-
-
 #include <iostream>
-#include <stdlib.h>
-#include <cstdlib>
-#include <cstdio>
-#include <time.h>
 #include "big_integer.hpp"
 
 using namespace std;
@@ -73,7 +67,6 @@ bool testOneMul() {
     big_integer bi2 = big_integer(rhs);
     bi1 *= bi2;
     big_integer ans = big_integer(ansInt);
-    //cerr << lhs << " * " << rhs << " = " << bi1 << " (" << ansInt << ")" << endl;
     return to_string(bi1) == to_string(ans);
 }
 
@@ -106,10 +99,9 @@ void testMul(int number) {
 
 int main() {
     srand (time(NULL));
-    big_integer x = big_integer(145);
-    big_integer y = big_integer(514);
-    x *= y;
-    cout << x << endl;
+    big_integer a("0010");
+    big_integer b("-05");
+    cout << (a += b);
     testAdd(1000);
     testSub(1000);
     testMul(1000);

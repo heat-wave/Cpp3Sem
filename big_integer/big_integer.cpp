@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "exception.cpp"
 
+//constructors
 big_integer::big_integer() {
     sign = 0;
     digits = std::vector<char>('0');
@@ -37,38 +38,49 @@ big_integer::big_integer(int number) {
 };
 
 big_integer::big_integer(std::string const& str) {
-    if (str == "") {
-        throw parse_exception("Empty string");
-    }
-    if (str == "0") {
+    if (str == "" || str == "0") {
         *this = big_integer();
     }
     else {
-        if (str[0] == '-') {
+        std::string temp = str;
+        int cut = 0;
+        if (temp.at(0) == '-')
+            cut = 1;
+        while (temp.at(cut) == '0' && cut < temp.size() - 1)
+            temp.erase(cut, cut);
+        if (temp == "0" || temp == "-0" || temp == "") {
+            *this = big_integer();
+            return;
+        }
+        std::reverse(temp.begin(), temp.end());
+        for (int i = 0; i < temp.size() - 1; ++i) {
+            if (!isdigit(temp[i])) {
+                throw parse_exception("Illegal character");
+            }
+            this->digits.push_back(temp[i] - 48);
+        }
+        if (temp[temp.size() - 1] == '-') {
             sign = -1;
         }
         else {
             sign = 1;
-            this->digits.push_back(str[0] - 48);
-        }
-        for (int i = 1; i < str.size(); ++i) {
-            if (!isdigit(str[i])) {
-                throw parse_exception("Illegal character");
-            }
-            this->digits.push_back(str[i] - 48);
+            this->digits.push_back(temp[temp.size() - 1] - 48);
         }
     }
 };
 
+//destructor
 big_integer::~big_integer() {
 };
 
+//assignment
 big_integer& big_integer::operator=(big_integer const& other) {
     this->digits = other.digits;
     this->sign = other.sign;
     return *this;
 };
 
+//add
 big_integer& big_integer::operator+=(big_integer const& rhs) {
     if (sign == 0) {
         *this = rhs;
@@ -116,6 +128,7 @@ big_integer& big_integer::operator+=(big_integer const& rhs) {
 
 };
 
+//subtract
 big_integer& big_integer::operator-=(big_integer const& rhs) {
     if (sign == rhs.sign) {
         big_integer temp;
@@ -149,6 +162,7 @@ big_integer& big_integer::operator-=(big_integer const& rhs) {
     }
 };
 
+//multiply by a one-digit number
 big_integer& big_integer::operator*=(char rhs) {
     int carry = 0;
     for (int i = 0; i < digits.size() || carry; ++i) {
@@ -163,6 +177,7 @@ big_integer& big_integer::operator*=(char rhs) {
     return *this;
 };
 
+//multiply by an arbitrary big_integer
 big_integer& big_integer::operator*=(big_integer const& rhs) {
     sign *= rhs.sign;
     if (!sign)
@@ -178,6 +193,7 @@ big_integer& big_integer::operator*=(big_integer const& rhs) {
     return *this = temp2;
 };
 
+//unary operators
 big_integer big_integer::operator+() const
 {
     return *this;
@@ -190,6 +206,7 @@ big_integer big_integer::operator-() const
     return temp;
 }
 
+//increment & decrement
 big_integer& big_integer::operator++() {
     return *this += 1;
 }
@@ -210,47 +227,8 @@ big_integer big_integer::operator--(int) {
     return temp;
 }
 
-bool big_integer::operator==(big_integer const& b) const {
-    return (this->digits == b.digits && this->sign == b.sign);
-}
 
-bool big_integer::operator!=(big_integer const& b) const {
-    return (!(*this == b));
-}
-
-bool big_integer::operator<(big_integer const& b) const {
-    if (*this == b)
-        return false;
-    if (this->sign == -1 && b.sign == 1)
-        return true;
-    if (this->sign == 1 && b.sign == -1)
-        return false;
-    if (absoluteComparator(*this, b) == 1) {
-        if (sign == 1)
-            return false;
-        else
-            return true;
-    }
-    else {
-        if (sign == 1)
-            return true;
-        else
-            return false;
-    }
-}
-
-bool big_integer::operator>(big_integer const& b) const {
-    return (-*this < -b);
-}
-
-bool big_integer::operator<=(big_integer const& b) const {
-    return (*this < b || *this == b);
-}
-
-bool big_integer::operator>=(big_integer const& b) const{
-    return (*this > b || *this == b);
-}
-
+//binary operators
 big_integer operator+(big_integer a, big_integer const& b) {
     return a += b;
 }
@@ -263,6 +241,7 @@ big_integer operator*(big_integer a, big_integer const& b) {
     return a *= b;
 }
 
+//converting a big_integer to a string representation
 std::string to_string(big_integer const &a) {
     std::string aux;
     for (int i = a.digits.size() - 1; i >= 0; --i) {
@@ -274,8 +253,7 @@ std::string to_string(big_integer const &a) {
     return aux;
 }
 
-//operator std::string() const;
-
+//stream operations
 std::ostream& operator<<(std::ostream& out, big_integer const& a) {
     return out << to_string(a);
 }
@@ -287,6 +265,8 @@ std::istream& operator>>(std::istream in, big_integer & a) {
     return in;
 }
 
+//auxiliary method for comparing two big_integers
+//disregarding their sign
 int absoluteComparator(big_integer const& a, big_integer const& b) {
     if (a.digits.size() > b.digits.size()) {
         return 1;
@@ -305,4 +285,46 @@ int absoluteComparator(big_integer const& a, big_integer const& b) {
         }
     }
     return 0;
+}
+
+//comparison
+bool operator==(big_integer const& a, big_integer const& b)  {
+    return (a.digits == b.digits && a.sign == b.sign);
+}
+
+bool operator!=(big_integer const& a, big_integer const& b)  {
+    return (!(a == b));
+}
+
+bool operator<(big_integer const& a, big_integer const& b)  {
+    if (a == b)
+        return false;
+    if (a.sign == -1 && b.sign == 1)
+        return true;
+    if (a.sign == 1 && b.sign == -1)
+        return false;
+    if (absoluteComparator(a, b) == 1) {
+        if (a.sign == 1)
+            return false;
+        else
+            return true;
+    }
+    else {
+        if (a.sign == 1)
+            return true;
+        else
+            return false;
+    }
+}
+
+bool operator>(big_integer const& a, big_integer const& b)  {
+    return (-a < -b);
+}
+
+bool operator<=(big_integer const& a, big_integer const& b)  {
+    return (a < b || a == b);
+}
+
+bool operator>=(big_integer const& a, big_integer const& b) {
+    return (a > b || a == b);
 }
