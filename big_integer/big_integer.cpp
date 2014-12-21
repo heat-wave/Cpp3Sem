@@ -4,20 +4,24 @@
 #include "exception.cpp"
 
 //constructors
+//default
 big_integer::big_integer() {
     sign = 0;
     digits = std::vector<char>('0');
 };
 
+//move
 big_integer::big_integer(big_integer && other) {
     *this = other;
 };
 
+//copy
 big_integer::big_integer(big_integer const& copy) {
     this->sign = copy.sign;
     this->digits = copy.digits;
 };
 
+//integer
 big_integer::big_integer(int number) {
     long long int extended = number;
     extended = std::abs(extended);
@@ -37,6 +41,7 @@ big_integer::big_integer(int number) {
     }
 };
 
+//string
 big_integer::big_integer(std::string const& str) {
     if (str == "" || str == "0") {
         *this = big_integer();
