@@ -106,7 +106,7 @@ big_integer& big_integer::operator+=(big_integer const& rhs) {
     }
     else {
         big_integer temp;
-        switch (absoluteComparator(*this, rhs)) {
+        switch (absolute_comparator(*this, rhs)) {
             case 0:
                 *this = big_integer();
                 return *this;
@@ -137,7 +137,7 @@ big_integer& big_integer::operator+=(big_integer const& rhs) {
 big_integer& big_integer::operator-=(big_integer const& rhs) {
     if (sign == rhs.sign) {
         big_integer temp;
-        switch (absoluteComparator(*this, rhs)) {
+        switch (absolute_comparator(*this, rhs)) {
             case 0:
                 *this = big_integer();
                 return *this;
@@ -272,7 +272,7 @@ std::istream& operator>>(std::istream in, big_integer & a) {
 
 //auxiliary method for comparing two big_integers
 //disregarding their sign
-int absoluteComparator(big_integer const& a, big_integer const& b) {
+int absolute_comparator(big_integer const &a, big_integer const &b) {
     if (a.digits.size() > b.digits.size()) {
         return 1;
     }

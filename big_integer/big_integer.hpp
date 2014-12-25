@@ -37,7 +37,7 @@ struct big_integer
 
     friend std::string to_string(big_integer const& a);
 
-    friend int absoluteComparator(big_integer const& a, big_integer const& b);
+    friend int absolute_comparator(big_integer const &a, big_integer const &b);
 
 private:
     std::vector<char> digits;
